@@ -5,22 +5,22 @@ input <- list(
               ##input into child model
               mat_prev = list(rep(NA, 53 * 10)),
               ## To be split into timing of infections later using existing proportions
-              mtct_rate = rep(0.05, 1000),
-              cotrim = rnorm(1000, mean = 0.33, 0.1),
-              numberonart_scalar =  rnorm(1000, mean = 0.96, sd = 0.082))
-
+              mtct_rate = rep(0.05, 100),
+              cotrim = rnorm(100, mean = 0.33, 0.1),
+              numberonart_scalar =  rnorm(100, mean = 0.96, sd = 0.082))
+input <- expand.grid(input)
 #eta
 eta <- function(
-    int = list(mat_prev, mtct_rate, cotrim, numberonart_scalar)
+    int = c(mat_prev, mtct_rate, cotrim, numberonart_scalar)
                 ){
-  y = eppasm_mod(int$mat_prev, int$mtct_rate, int$cotrim, int$numberonart_scalar)
+  y = eppasm_mod(int)
   return(y)
 }
 
 
 #x_all
 Xall <- function(){
-  row = sample(1000, 1)
+  row = sample(nrow(input), 1)
   return(list(mat_prev = input$mat_prev[row], 
               mtct_rate = input$mtct_rate[row], 
               cotrim = input$cotrim[row],
@@ -28,11 +28,18 @@ Xall <- function(){
               ))
 }
 
-Xset <- function(a, b, c){
-  test <- input[sample(1000,1),a]
-  names(test) = names(input)[a]
-  test = data.frame(test)
-  names(test) <- names(input)[a]
+Xset <- function(a_1, b_1, c_1){
+  if(is.null(b)){
+    test <- input[sample(nrow(input),1),a_1]
+    names(test) = names(input)[a_1]
+    test = data.frame(test)
+    names(test) <- names(input)[a_1]
+  }else{
+    rows <- intersect(which(input$b == unlist(c_1[1])), which(input$c == unlist(c_1[2])))
+    sample <- sample(rows,1)
+    test <- input[sample,]
+    test = data.frame(test)
+  }
   return(test)
 }
 

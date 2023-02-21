@@ -6,7 +6,8 @@ a_obs <- rnorm(100, mean = 2, sd = 0.5)
 b_obs <- rnorm(100, mean = -5, sd = 0.1)
 c_obs <- rnorm(100, mean = -5, sd = 1)
 
-input <- data.frame(a = a_obs, b = b_obs, c = c_obs)
+input <- list(a = a_obs, b = b_obs, c = c_obs)
+input <- expand.grid(input)
 eta <- function(
     int = list(a = 2, b = -5, c = -5)
                 ){
@@ -21,11 +22,18 @@ Xall <- function(){
   return(list(a = input[row,1], b = input[row,2], c = input[row,3]))
 }
 
-Xset <- function(a, b, c){
-  test <- input[sample(100,1),a]
-  names(test) = colnames(input)[a]
-  test = data.frame(test)
-  colnames(test) <- colnames(input)[a]
+Xset <- function(a_1, b_1, c_1){
+  if(is.null(b)){
+    test <- input[sample(nrow(input),1),a_1]
+    names(test) = names(input)[a_1]
+    test = data.frame(test)
+    names(test) <- names(input)[a_1]
+  }else{
+    rows <- intersect(which(input$b == unlist(c_1[1])), which(input$c == unlist(c_1[2])))
+    sample <- sample(rows,1)
+    test <- input[sample,]
+    test = data.frame(test)
+  }
   return(test)
 }
 
@@ -49,7 +57,7 @@ for (i in 1:Nv){
   val = eta(X)
   Y <- c(Y, val)
 }
-
+Y <- unlist(unname(Y))
 
 EY = mean(Y)
 VarY = var(Y)
