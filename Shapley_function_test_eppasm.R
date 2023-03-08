@@ -1,14 +1,4 @@
-set.seed(1)
-library(data.table)
 
-input <- list(
-              ##input into child model
-              mat_prev = list(rep(NA, 53 * 10)),
-              ## To be split into timing of infections later using existing proportions
-              mtct_rate = rep(0.05, 100),
-              cotrim = rnorm(100, mean = 0.33, 0.1),
-              numberonart_scalar =  rnorm(100, mean = 0.96, sd = 0.082))
-input <- expand.grid(input)
 #eta
 eta <- function(
     int = c(mat_prev, mtct_rate, cotrim, numberonart_scalar)
@@ -43,7 +33,7 @@ Xset <- function(a_1, b_1, c_1){
   return(test)
 }
 
-k <- 4
+k <- 5
 Nv <- 100
 Ni <- 100
 No <- 100
@@ -68,7 +58,7 @@ for (i in 1:Nv){
 EY = mean(Y)
 VarY = var(Y)
 
-# Generate all k! permutations
+# Generate all k! permutations (k! or 2^k?)
 perms = gtools::permutations(k, k, 1:k)
 
 # Estimate Shapley effects
